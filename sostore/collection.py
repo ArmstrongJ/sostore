@@ -34,13 +34,13 @@ class Collection():
         """Initializes access to a collection
         
         Args:
+            collection  The collection within the database to use
+            
             connection  A valid sqlite3.Connection object, can be None
                         if db is specified
                         
             db          Database filename, unused if connection is
                         specified
-                        
-            collection  The collection within the database to use
         """
         
         if collection is None:
@@ -118,7 +118,6 @@ class Collection():
                 for k in toret.keys():
                     if not k in fields:
                         del toret[k]
-            
             entries.append(toret)
 
         return entries    
@@ -200,7 +199,7 @@ class Collection():
             object_or_id    Either an object with a valid "_id" key 
                             or the object's id itself
         """
-        aa
+        
         deletion = object_or_id
         if isinstance(deletion, dict):
             deletion = object_or_id[_ID_COLUMN]
@@ -223,6 +222,7 @@ class Collection():
         """
         
         id = self.find_field(field, value)
+        
         if len(id) == 0:
             return None
         else:
