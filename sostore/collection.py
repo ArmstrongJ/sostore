@@ -177,7 +177,7 @@ class Collection():
                     replace the existing dictionary associated with the id
         """
         
-        if object[_ID_COLUMN] is None:
+        if not _ID_COLUMN in object.keys():
             raise ValueError('Update called on a nonexistant db record')
 
         id = object[_ID_COLUMN]

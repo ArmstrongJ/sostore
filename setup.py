@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+import setuptools
 from distutils.core import setup
 
 LONG_DESC = \
@@ -26,6 +26,7 @@ setup(name='sostore',
       author_email='jeffrey.armstrong@approximatrix.com',
       url='https://github.com/ArmstrongJ/sostore',
       packages=['sostore',],
+      test_suite='tests.suite',
       
       license='GPL3',
       classifiers=[
