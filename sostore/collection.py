@@ -92,9 +92,9 @@ class Collection():
         for id in ids:
             d = self.get(id)
             if fields is not None:
-                for k in d.keys():
-                    if not k in fields:
-                        del d[k]
+                removed_keys = [key for key in d.keys() if not key in fields]
+                for k in removed_keys:
+                    del d[k]
             entries.append(d)
             
         return entries
@@ -115,9 +115,9 @@ class Collection():
             toret = json.loads(row[1])
             toret[_ID_COLUMN] = row[0]
             if fields is not None:
-                for k in toret.keys():
-                    if not k in fields:
-                        del toret[k]
+                removed_keys = [key for key in toret.keys() if not key in fields]
+                for k in removed_keys:
+                    del toret[k]
             entries.append(toret)
 
         return entries    
