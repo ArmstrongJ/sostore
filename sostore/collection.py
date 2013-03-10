@@ -129,18 +129,6 @@ class Collection():
             if self.get(id) is None:
                 return id
 
-    def _match_value(self, value, check):
-        """Private value matching (helps with string<->int comparisons)"""
-        if type(value) == type(check):
-            return value == check
-        elif isinstance(value, int):
-            try:
-                return value == int(check)
-            except ValueError:
-                return False
-        else:
-            return False
-
     def insert(self, object, randomize=False):
         """Inserts a new dictionary into the Collection
         
@@ -253,7 +241,7 @@ class Collection():
         
         return None
     
-    def find_field(self, field, value):
+    def find_field(self, field, value, compare_function=None):
         """Finds id's of dictionaries in the Collection that have a matching value for a specified key (field).
         
         Args:
@@ -263,6 +251,10 @@ class Collection():
             value   The value to search for in the specified dictionary 
                     key
                     
+            compare_function    A function that accepts two values and returns
+                                True if equal, False otherwise.  Defaults to
+                                None to use ==
+                    
         Notes:
             If the value of the field in the dictionary is a list, the routine
             will search each element of the list for a matching value.  If the
@@ -270,13 +262,28 @@ class Collection():
             an integer, a conversion will be attempted during matching.
         """
         
-        fieldsearch = self.all(fields=('_id', field))
+        fieldsearch = self.all(fields=(_ID_COLUMN, field))
         matching = []
         for d in fieldsearch:
+            
+            if not field in d.keys():
+                continue
+                
+            matched = False
             if isinstance(d[field], collections.Iterable) and not isinstance(d[field], str):
-                if value in d[field]:
-                    matching.append(d['_id'])
-            elif d[field] == value:
-                matching.append(d['_id'])
+                if compare_function is not None:
+                    for stored_value in d[field]:                    
+                        matched = matched or compare_function(value, stored_value)
+                else:
+                    matched = value in d[field]
+                                        
+            elif compare_function is not None:
+                matched = compare_function(value, d[field])
+            
+            else:
+                matched = (value == d[field])
+                
+            if matched:
+                matching.append(d[ID_KEY])
                 
         return matching
