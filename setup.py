@@ -19,7 +19,7 @@ contain sqlite3.Connection objects.
 """
 
 setup(name='sostore',
-      version='0.1',
+      version='0.2',
       description='SQLite Object Store - An absurdly simple object "database" for Python',
       long_description=LONG_DESC,
       author='Jeffrey Armstrong',
