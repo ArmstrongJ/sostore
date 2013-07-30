@@ -1,5 +1,5 @@
 import unittest
-from sostore import Collection, ID_KEY
+from sostore import Collection, ID_KEY, ConnectionException
 
 class CollectionTestCase(unittest.TestCase):
     def setUp(self):
@@ -10,6 +10,10 @@ class CollectionTestCase(unittest.TestCase):
         
     def test_connection(self):
         self.assertIsNotNone(self.db.connection)
+        
+    def test_connection_closed(self):
+        self.db.done()
+        self.assertRaises(ConnectionException, self.db.all)
         
     def test_insert(self):
         d = {'first': 'Margaux', 'last': 'LaFleur', 'age': 27, 'female': True}

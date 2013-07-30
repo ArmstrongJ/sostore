@@ -21,6 +21,8 @@ import json
 import collections
 import random
 
+from sostore.errors import RandomIdException, ConnectionException
+
 _ID_COLUMN = '_id'
 _DATA_COLUMN = '_data'
 
@@ -28,6 +30,8 @@ ID_KEY = _ID_COLUMN
 
 ASCENDING  = 'ASC'
 DESCENDING = 'DESC'
+
+RANDOM_ATTEMPT_LIMIT = 1000
 
 class Collection():
     def __init__(self, collection, connection=None, db=":memory:"):
@@ -47,14 +51,21 @@ class Collection():
             raise ValueError('A Collection name must be specified')
     
         if connection is not None:
-            self.connection = connection
+            self._connection = connection
         else:
-            self.connection = sqlite3.connect(db, isolation_level=None)
+            self._connection = sqlite3.connect(db, isolation_level=None)
             
         self.collection = collection
         
         self.connection.execute("CREATE TABLE IF NOT EXISTS {0}({1} INTEGER PRIMARY KEY AUTOINCREMENT, {2} TEXT)".format(self.collection, _ID_COLUMN, _DATA_COLUMN))
         self.connection.commit()
+        
+    @property
+    def connection(self):
+        if self._connection is None:
+            raise ConnectionException(self.collection)
+        else:
+            return self._connection
         
     @property
     def count(self):
@@ -65,9 +76,9 @@ class Collection():
         
     def done(self):
         """Closes the connection to the Collection"""
-        if self.connection is not None:
+        if self._connection is not None:
             self.connection.close()
-        self.connection = None
+        self._connection = None
         
     def get(self, id):
         """Retrieves a dictionary from the Collection
@@ -131,10 +142,23 @@ class Collection():
 
     def _random_id(self):
         """Private random database id generator"""
-        while True:
-            id = random.randint(1E+6, 1E+9)
+        
+        # The following causes our randomization to expand if
+        # we're dealing with an extremely large number of 
+        # entries (probably a bad idea for this db).
+        topmost = max(1E+9, 10*self.count)
+        
+        # At this point, our random range should be at _least_ 10 times
+        # larger than our current row count.  On average only one in 10
+        # id's should be a duplicate, but we need to check
+        attempts = 0
+        while attempts < RANDOM_ATTEMPT_LIMIT:
+            id = random.randint(1E+6, topmost)
             if self.get(id) is None:
                 return id
+            attempts += 1
+            
+        raise RandomIdException(self.collection)
 
     def insert(self, object, randomize=False):
         """Inserts a new dictionary into the Collection
@@ -144,6 +168,15 @@ class Collection():
             
             randomize   Randomize the object's id in the Collection, defaults to False
             
+        Throws:
+            sostore.RandomIdException
+                        This method may throw a RandomIdException in the unlikely event
+                        that randomize is True and a unique id cannot be found in a
+                        reasonable number of passes
+                        
+            ValueError  This method will throw a ValueError if an insert is attempted 
+                        with an already-existant id
+                        
         """
             
         if _ID_COLUMN in object:
