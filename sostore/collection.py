@@ -56,6 +56,13 @@ class Collection():
         self.connection.execute("CREATE TABLE IF NOT EXISTS {0}({1} INTEGER PRIMARY KEY AUTOINCREMENT, {2} TEXT)".format(self.collection, _ID_COLUMN, _DATA_COLUMN))
         self.connection.commit()
         
+    @property
+    def count(self):
+        """Returns the number of items in the collection"""
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT COUNT({0}) FROM {1}".format(_ID_COLUMN, self.collection))
+        return cursor.fetchone()[0]
+        
     def done(self):
         """Closes the connection to the Collection"""
         if self.connection is not None:

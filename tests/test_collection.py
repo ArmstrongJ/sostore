@@ -76,6 +76,20 @@ class CollectionTestCase(unittest.TestCase):
         self.db.remove(d1)
         self.assertIsNone(self.db.get(d1[ID_KEY]))
         
+    def test_count(self):
+        d1 = {'first': 'Henry', 'last': 'McCallum'}
+        d2 = {'first': 'Margaux', 'last': 'LaFleur'}
+        d3 = {'first': 'Stephen', 'occupation': 'king'}
+        d1 = self.db.insert(d1)
+        d2 = self.db.insert(d2)
+        d3 = self.db.insert(d3)
+        
+        self.assertEqual(self.db.count, 3)
+        
+        self.db.remove(d3)
+        
+        self.assertEqual(self.db.count, 2)
+        
     def test_get(self):
         d1 = {'first': 'Henry', 'last': 'McCallum'}
         d2 = {'first': 'Margaux', 'last': 'LaFleur'}
