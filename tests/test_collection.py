@@ -4,9 +4,11 @@ from sostore import Collection, ID_KEY, ConnectionException
 class CollectionTestCase(unittest.TestCase):
     def setUp(self):
         self.db = Collection("testcases", db=":memory:")
+        self.randomdb = Collection("testcases", db=":memory:", randomized=True)
         
     def tearDown(self):
         self.db.done()
+        self.randomdb.done()
         
     def test_connection(self):
         self.assertIsNotNone(self.db.connection)
@@ -14,6 +16,13 @@ class CollectionTestCase(unittest.TestCase):
     def test_connection_closed(self):
         self.db.done()
         self.assertRaises(ConnectionException, self.db.all)
+        
+    def test_collection_properties(self):
+        self.assertFalse(self.db.randomized)
+        self.assertTrue(self.randomdb.randomized)
+        
+        self.assertEqual(self.db.collection, "testcases")
+        self.assertEqual(self.randomdb.collection, "testcases")
         
     def test_insert(self):
         d = {'first': 'Margaux', 'last': 'LaFleur', 'age': 27, 'female': True}
@@ -30,12 +39,12 @@ class CollectionTestCase(unittest.TestCase):
             
     def test_insert_randomize(self):
         d = {'first': 'Margaux', 'last': 'LaFleur', 'age': 27, 'female': True}
-        res = self.db.insert(d, randomize=True)
+        res = self.randomdb.insert(d)
         
         self.assertTrue(res[ID_KEY] >= 1E+6)
         
         d2 = {'first': 'Henry'}
-        res2 = self.db.insert(d2, randomize=True)
+        res2 = self.randomdb.insert(d2)
         
         # Check for non-sequential keys
         self.assertTrue(abs(d2[ID_KEY] - d[ID_KEY]) > 1)
