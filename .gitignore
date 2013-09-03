@@ -35,3 +35,5 @@ nosetests.xml
 .pydevproject
 *.prj
 
+# Doc directories
+_*
