@@ -207,6 +207,11 @@ class Collection():
         Args:
             object  A dictionary with a valid "_id" key, which will entirely
                     replace the existing dictionary associated with the id
+                    
+        Raises:
+            ValueError  This method will throw a ValueError if an update is 
+                        attempted and the dictionary does not include an 
+                        already-existant id
         """
         
         if not _ID_COLUMN in object.keys():
