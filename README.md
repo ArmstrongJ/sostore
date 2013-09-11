@@ -22,6 +22,14 @@ Requirements
 
 sostore should work with Python 2.6 and higher, including Python 3.x. 
 
+Documentation
+-------------
+
+Documentation for sostore can be found, in Spinx-compatible format, in the
+_docs_ folder.  The docs can be viewed directly at:
+
+[http://sostore.readthedocs.org/en/latest/](http://sostore.readthedocs.org/en/latest/)
+
 Usage
 -----
 

@@ -16,6 +16,9 @@ by the developer.
 sostore is almost certainly not performant.  It can be thread-safe as 
 long as Collection objects aren't passed around between threads as they
 contain sqlite3.Connection objects.
+
+More help is available at: http://sostore.readthedocs.org/en/latest/
+
 """
 
 setup(name='sostore',
